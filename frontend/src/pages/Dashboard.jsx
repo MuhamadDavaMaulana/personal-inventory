@@ -35,9 +35,7 @@ export default function Dashboard() {
         })
 
         setRecentItems([...items].reverse().slice(0, 5))
-        setRecentLoans(
-          loans.filter(l => l.status === 'active').slice(0, 5)
-        )
+        setRecentLoans(loans.filter(l => l.status === 'active').slice(0, 5))
       } catch (_) {}
       finally { setLoading(false) }
     }
@@ -54,36 +52,36 @@ export default function Dashboard() {
 
   const statCards = [
     {
-      label:   'Total Barang',
-      value:   stats.total_items,
-      icon:    <BoxIcon />,
-      bg:      'linear-gradient(135deg, #1E3A8A, #2563EB)',
-      shadow:  'rgba(37,99,235,0.35)',
-      link:    '/items',
+      label:  'Total Barang',
+      value:  stats.total_items,
+      icon:   <BoxIcon />,
+      bg:     'linear-gradient(135deg, #1E3A8A, #2563EB)',
+      shadow: 'rgba(37,99,235,0.35)',
+      link:   '/items',
     },
     {
-      label:   'Tersedia',
-      value:   stats.available,
-      icon:    <CheckIcon />,
-      bg:      'linear-gradient(135deg, #065F46, #059669)',
-      shadow:  'rgba(5,150,105,0.3)',
-      link:    '/items',
+      label:  'Tersedia',
+      value:  stats.available,
+      icon:   <CheckIcon />,
+      bg:     'linear-gradient(135deg, #065F46, #059669)',
+      shadow: 'rgba(5,150,105,0.3)',
+      link:   '/items',
     },
     {
-      label:   'Dipinjam',
-      value:   stats.borrowed,
-      icon:    <LoanIcon />,
-      bg:      'linear-gradient(135deg, #92400E, #D97706)',
-      shadow:  'rgba(217,119,6,0.3)',
-      link:    '/loans',
+      label:  'Dipinjam',
+      value:  stats.borrowed,
+      icon:   <LoanIcon />,
+      bg:     'linear-gradient(135deg, #92400E, #D97706)',
+      shadow: 'rgba(217,119,6,0.3)',
+      link:   '/loans',
     },
     {
-      label:   'Kategori',
-      value:   stats.total_categories,
-      icon:    <CategoryIcon />,
-      bg:      'linear-gradient(135deg, #4C1D95, #7C3AED)',
-      shadow:  'rgba(124,58,237,0.3)',
-      link:    '/categories',
+      label:  'Kategori',
+      value:  stats.total_categories,
+      icon:   <CategoryIcon />,
+      bg:     'linear-gradient(135deg, #4C1D95, #7C3AED)',
+      shadow: 'rgba(124,58,237,0.3)',
+      link:   '/categories',
     },
   ]
 
@@ -107,86 +105,115 @@ export default function Dashboard() {
 
         .stat-card:hover {
           transform:  translateY(-4px) !important;
-          box-shadow: 0 16px 40px var(--card-shadow) !important;
         }
         .row-item:hover {
           background: #F8FAFF !important;
+        }
+
+        .stat-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+          margin-bottom: 28px;
+          animation: fadeUp 0.45s ease 0.05s both;
+        }
+
+        .body-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+          animation: fadeUp 0.45s ease 0.15s both;
+        }
+
+        .dashboard-padding {
+          padding: 32px 24px;
+        }
+
+        .header-padding {
+          padding: 32px 36px;
+        }
+
+        .header-title {
+          font-size: 26px;
+        }
+
+        @media (max-width: 768px) {
+          .stat-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+          .body-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .dashboard-padding {
+            padding: 16px 12px;
+          }
+          .header-padding {
+            padding: 20px 20px;
+            margin-bottom: 16px !important;
+          }
+          .header-title {
+            font-size: 20px !important;
+          }
         }
       `}</style>
 
       <Navbar />
 
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto' }} className="dashboard-padding">
 
         {/* ── Header ── */}
-        <div style={{
-          background:   'linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 55%, #3B82F6 100%)',
-          borderRadius: '20px',
-          padding:      '32px 36px',
-          marginBottom: '28px',
-          position:     'relative',
-          overflow:     'hidden',
-          boxShadow:    '0 8px 32px rgba(29,78,216,0.28)',
-          animation:    'fadeUp 0.4s ease both',
-        }}>
+        <div
+          className="header-padding"
+          style={{
+            background:   'linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 55%, #3B82F6 100%)',
+            borderRadius: '20px',
+            marginBottom: '28px',
+            position:     'relative',
+            overflow:     'hidden',
+            boxShadow:    '0 8px 32px rgba(29,78,216,0.28)',
+            animation:    'fadeUp 0.4s ease both',
+          }}
+        >
           <div style={{
-            position:     'absolute', top: '-40px', right: '-40px',
-            width:        '200px',    height: '200px',
-            borderRadius: '50%',
-            background:   'rgba(255,255,255,0.05)',
+            position: 'absolute', top: '-40px', right: '-40px',
+            width: '200px', height: '200px', borderRadius: '50%',
+            background: 'rgba(255,255,255,0.05)',
           }} />
           <div style={{
-            position:     'absolute', bottom: '-20px', right: '120px',
-            width:        '120px',    height: '120px',
-            borderRadius: '50%',
-            background:   'rgba(255,255,255,0.04)',
+            position: 'absolute', bottom: '-20px', right: '120px',
+            width: '120px', height: '120px', borderRadius: '50%',
+            background: 'rgba(255,255,255,0.04)',
           }} />
 
           <div style={{ position: 'relative', zIndex: 1 }}>
             <p style={{
-              color:         'rgba(255,255,255,0.65)',
-              fontSize:      '13px',
-              fontWeight:    600,
-              marginBottom:  '6px',
-              letterSpacing: '0.02em',
+              color: 'rgba(255,255,255,0.65)', fontSize: '13px',
+              fontWeight: 600, marginBottom: '6px', letterSpacing: '0.02em',
             }}>
               {greeting()},
             </p>
-            <h1 style={{
-              color:        '#ffffff',
-              fontSize:     '26px',
-              fontWeight:   800,
-              margin:       '0 0 6px',
-              letterSpacing: '-0.5px',
+            <h1 className="header-title" style={{
+              color: '#ffffff', fontWeight: 800,
+              margin: '0 0 6px', letterSpacing: '-0.5px',
             }}>
               {user.name ?? 'Pengguna'} 👋
             </h1>
-            <p style={{
-              color:        'rgba(255,255,255,0.6)',
-              fontSize:     '13.5px',
-              margin:       0,
-            }}>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13.5px', margin: 0 }}>
               Berikut ringkasan inventaris barang pribadimu hari ini.
             </p>
           </div>
         </div>
 
         {/* ── Stat Cards ── */}
-        <div style={{
-          display:             'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap:                 '16px',
-          marginBottom:        '28px',
-          animation:           'fadeUp 0.45s ease 0.05s both',
-        }}>
+        <div className="stat-grid">
           {loading
             ? Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} style={{
-                  height:     '130px',
-                  borderRadius: '16px',
-                  background:   'linear-gradient(90deg, #E2E8F0 25%, #EEF2FF 50%, #E2E8F0 75%)',
-                  backgroundSize: '600px 100%',
-                  animation:    'shimmer 1.4s infinite',
+                  height: '130px', borderRadius: '16px',
+                  background: 'linear-gradient(90deg, #E2E8F0 25%, #EEF2FF 50%, #E2E8F0 75%)',
+                  backgroundSize: '600px 100%', animation: 'shimmer 1.4s infinite',
                 }} />
               ))
             : statCards.map((c, i) => (
@@ -195,41 +222,33 @@ export default function Dashboard() {
                   to={c.link}
                   className="stat-card"
                   style={{
-                    '--card-shadow':  c.shadow,
-                    background:       c.bg,
-                    borderRadius:     '18px',
-                    padding:          '22px 20px',
-                    textDecoration:   'none',
-                    display:          'block',
-                    boxShadow:        `0 6px 20px ${c.shadow}`,
-                    transition:       'all 0.2s ease',
-                    animation:        `fadeUp 0.4s ease ${0.08 * i}s both`,
+                    background:     c.bg,
+                    borderRadius:   '18px',
+                    padding:        '22px 20px',
+                    textDecoration: 'none',
+                    display:        'block',
+                    boxShadow:      `0 6px 20px ${c.shadow}`,
+                    transition:     'all 0.2s ease',
+                    animation:      `fadeUp 0.4s ease ${0.08 * i}s both`,
                   }}
                 >
                   <div style={{
-                    width:        '40px', height: '40px',
-                    borderRadius: '12px',
-                    background:   'rgba(255,255,255,0.18)',
-                    display:      'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: '14px',
-                    color:        '#ffffff',
+                    width: '40px', height: '40px', borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.18)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: '14px', color: '#ffffff',
                   }}>
                     {c.icon}
                   </div>
                   <div style={{
-                    fontSize:   '32px',
-                    fontWeight: 800,
-                    color:      '#ffffff',
-                    lineHeight: 1,
-                    marginBottom: '5px',
+                    fontSize: '32px', fontWeight: 800,
+                    color: '#ffffff', lineHeight: 1, marginBottom: '5px',
                   }}>
                     {c.value}
                   </div>
                   <div style={{
-                    fontSize:   '12.5px',
-                    fontWeight: 600,
-                    color:      'rgba(255,255,255,0.75)',
-                    letterSpacing: '0.01em',
+                    fontSize: '12.5px', fontWeight: 600,
+                    color: 'rgba(255,255,255,0.75)',
                   }}>
                     {c.label}
                   </div>
@@ -238,33 +257,22 @@ export default function Dashboard() {
           }
         </div>
 
-        {/* ── Body: 2 kolom ── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap:     '20px',
-          animation: 'fadeUp 0.45s ease 0.15s both',
-        }}>
+        {/* ── Body: 2 kolom → 1 kolom di HP ── */}
+        <div className="body-grid">
 
           {/* ── Barang Terbaru ── */}
           <div style={{
-            background:   '#ffffff',
-            borderRadius: '18px',
-            border:       '1px solid #E2E8F0',
-            overflow:     'hidden',
-            boxShadow:    '0 2px 12px rgba(0,0,0,0.05)',
+            background: '#ffffff', borderRadius: '18px',
+            border: '1px solid #E2E8F0', overflow: 'hidden',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
           }}>
             <div style={{
-              padding:        '18px 20px 14px',
-              borderBottom:   '1px solid #F1F5F9',
-              display:        'flex',
-              alignItems:     'center',
-              justifyContent: 'space-between',
+              padding: '18px 20px 14px', borderBottom: '1px solid #F1F5F9',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
                 <div style={{
-                  width: '32px', height: '32px',
-                  borderRadius: '9px',
+                  width: '32px', height: '32px', borderRadius: '9px',
                   background: 'linear-gradient(135deg, #EEF2FF, #DBEAFE)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
@@ -274,10 +282,7 @@ export default function Dashboard() {
                   Barang Terbaru
                 </span>
               </div>
-              <Link to="/items" style={{
-                fontSize: '12px', fontWeight: 600,
-                color: '#2563EB', textDecoration: 'none',
-              }}>
+              <Link to="/items" style={{ fontSize: '12px', fontWeight: 600, color: '#2563EB', textDecoration: 'none' }}>
                 Lihat Semua →
               </Link>
             </div>
@@ -301,20 +306,15 @@ export default function Dashboard() {
                     key={item.id ?? i}
                     className="row-item"
                     style={{
-                      display:       'flex',
-                      alignItems:    'center',
-                      justifyContent: 'space-between',
-                      padding:        '12px 20px',
-                      borderBottom:   i < recentItems.length - 1
-                        ? '1px solid #F8FAFF' : 'none',
-                      transition:     'background 0.15s ease',
-                      cursor:         'default',
+                      display: 'flex', alignItems: 'center',
+                      justifyContent: 'space-between', padding: '12px 20px',
+                      borderBottom: i < recentItems.length - 1 ? '1px solid #F8FAFF' : 'none',
+                      transition: 'background 0.15s ease',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={{
-                        width: '34px', height: '34px',
-                        borderRadius: '10px',
+                        width: '34px', height: '34px', borderRadius: '10px',
                         background: 'linear-gradient(135deg, #EEF2FF, #DBEAFE)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         flexShrink: 0,
@@ -345,23 +345,17 @@ export default function Dashboard() {
 
           {/* ── Peminjaman Aktif ── */}
           <div style={{
-            background:   '#ffffff',
-            borderRadius: '18px',
-            border:       '1px solid #E2E8F0',
-            overflow:     'hidden',
-            boxShadow:    '0 2px 12px rgba(0,0,0,0.05)',
+            background: '#ffffff', borderRadius: '18px',
+            border: '1px solid #E2E8F0', overflow: 'hidden',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
           }}>
             <div style={{
-              padding:        '18px 20px 14px',
-              borderBottom:   '1px solid #F1F5F9',
-              display:        'flex',
-              alignItems:     'center',
-              justifyContent: 'space-between',
+              padding: '18px 20px 14px', borderBottom: '1px solid #F1F5F9',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
                 <div style={{
-                  width: '32px', height: '32px',
-                  borderRadius: '9px',
+                  width: '32px', height: '32px', borderRadius: '9px',
                   background: 'linear-gradient(135deg, #FEF3C7, #FDE68A)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
@@ -371,10 +365,7 @@ export default function Dashboard() {
                   Peminjaman Aktif
                 </span>
               </div>
-              <Link to="/loans" style={{
-                fontSize: '12px', fontWeight: 600,
-                color: '#2563EB', textDecoration: 'none',
-              }}>
+              <Link to="/loans" style={{ fontSize: '12px', fontWeight: 600, color: '#2563EB', textDecoration: 'none' }}>
                 Lihat Semua →
               </Link>
             </div>
@@ -398,20 +389,15 @@ export default function Dashboard() {
                     key={loan.id ?? i}
                     className="row-item"
                     style={{
-                      display:        'flex',
-                      alignItems:     'center',
-                      justifyContent: 'space-between',
-                      padding:        '12px 20px',
-                      borderBottom:   i < recentLoans.length - 1
-                        ? '1px solid #F8FAFF' : 'none',
-                      transition:     'background 0.15s ease',
-                      cursor:         'default',
+                      display: 'flex', alignItems: 'center',
+                      justifyContent: 'space-between', padding: '12px 20px',
+                      borderBottom: i < recentLoans.length - 1 ? '1px solid #F8FAFF' : 'none',
+                      transition: 'background 0.15s ease',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={{
-                        width: '34px', height: '34px',
-                        borderRadius: '10px',
+                        width: '34px', height: '34px', borderRadius: '10px',
                         background: 'linear-gradient(135deg, #FEF3C7, #FDE68A)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         flexShrink: 0,
@@ -448,9 +434,7 @@ export default function Dashboard() {
   )
 }
 
-// ════════════════════════════════════════════════════════════════
-// SUB-COMPONENTS
-// ════════════════════════════════════════════════════════════════
+// ── Sub Components ──────────────────────────────────────────────
 
 function StatusBadge({ status }) {
   const map = {
@@ -463,11 +447,9 @@ function StatusBadge({ status }) {
       display: 'inline-flex', alignItems: 'center', gap: '5px',
       padding: '3px 10px', borderRadius: '20px',
       background: s.bg, fontSize: '11px', fontWeight: 700, color: s.color,
-      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      whiteSpace: 'nowrap',
     }}>
-      <span style={{
-        width: '6px', height: '6px', borderRadius: '50%', background: s.dot,
-      }} />
+      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: s.dot }} />
       {s.label}
     </span>
   )
@@ -481,7 +463,7 @@ function LoanStatusBadge({ status, dueDate }) {
         display: 'inline-flex', alignItems: 'center', gap: '5px',
         padding: '3px 10px', borderRadius: '20px',
         background: '#FEF2F2', fontSize: '11px', fontWeight: 700, color: '#DC2626',
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
+        whiteSpace: 'nowrap',
       }}>
         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#EF4444' }} />
         Terlambat
@@ -493,7 +475,7 @@ function LoanStatusBadge({ status, dueDate }) {
       display: 'inline-flex', alignItems: 'center', gap: '5px',
       padding: '3px 10px', borderRadius: '20px',
       background: '#FFFBEB', fontSize: '11px', fontWeight: 700, color: '#D97706',
-      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      whiteSpace: 'nowrap',
     }}>
       <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#F59E0B' }} />
       Aktif
@@ -505,8 +487,7 @@ function EmptyState({ label }) {
   return (
     <div style={{ padding: '36px 20px', textAlign: 'center' }}>
       <div style={{
-        width: '44px', height: '44px',
-        borderRadius: '12px',
+        width: '44px', height: '44px', borderRadius: '12px',
         background: '#F1F5F9',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         margin: '0 auto 12px',
@@ -520,9 +501,7 @@ function EmptyState({ label }) {
   )
 }
 
-// ════════════════════════════════════════════════════════════════
-// ICONS
-// ════════════════════════════════════════════════════════════════
+// ── Icons ───────────────────────────────────────────────────────
 
 function BoxIcon({ size = 18, color = '#ffffff' }) {
   return (

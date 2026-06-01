@@ -28,6 +28,17 @@ function Badge({ map, value }) {
   )
 }
 
+// ── PERBAIKAN: FormField dipindah ke luar ItemModal ──────────────────────────
+function FormField({ label, error, children }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={s.label}>{label}</label>
+      {children}
+      {error && <p style={s.errText}>{error}</p>}
+    </div>
+  )
+}
+
 function SkeletonRow() {
   return (
     <tr>
@@ -96,14 +107,6 @@ function ItemModal({ isOpen, onClose, onSubmit, initial, categories }) {
     setSaving(false)
   }
 
-  const F = ({ label, error, children }) => (
-    <div style={{ marginBottom: 14 }}>
-      <label style={s.label}>{label}</label>
-      {children}
-      {error && <p style={s.errText}>{error}</p>}
-    </div>
-  )
-
   return (
     <div style={s.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div style={{ ...s.modal, margin: '0 16px' }}>
@@ -113,15 +116,15 @@ function ItemModal({ isOpen, onClose, onSubmit, initial, categories }) {
         </div>
 
         <div style={s.mBody}>
-          <F label="Nama Barang *" error={errors.name}>
+          <FormField label="Nama Barang *" error={errors.name}>
             <input style={{ ...s.input, ...(errors.name ? s.inputErr : {}) }}
               placeholder="Contoh: Laptop Dell XPS"
               value={form.name}
               onChange={e => setForm({ ...form, name: e.target.value })} />
-          </F>
+          </FormField>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <F label="Kategori *" error={errors.category_id}>
+            <FormField label="Kategori *" error={errors.category_id}>
               <select style={{ ...s.input, ...(errors.category_id ? s.inputErr : {}) }}
                 value={form.category_id}
                 onChange={e => setForm({ ...form, category_id: e.target.value })}>
@@ -130,35 +133,35 @@ function ItemModal({ isOpen, onClose, onSubmit, initial, categories }) {
                   <option key={c.category_id} value={c.category_id}>{c.name}</option>
                 ))}
               </select>
-            </F>
-            <F label="Jumlah *" error={errors.quantity}>
+            </FormField>
+            <FormField label="Jumlah *" error={errors.quantity}>
               <input type="number" min={1} style={{ ...s.input, ...(errors.quantity ? s.inputErr : {}) }}
                 value={form.quantity}
                 onChange={e => setForm({ ...form, quantity: +e.target.value })} />
-            </F>
-            <F label="Kondisi">
+            </FormField>
+            <FormField label="Kondisi">
               <select style={s.input} value={form.condition}
                 onChange={e => setForm({ ...form, condition: e.target.value })}>
                 <option value="good">Bagus</option>
                 <option value="damaged">Rusak</option>
                 <option value="lost">Hilang</option>
               </select>
-            </F>
-            <F label="Status">
+            </FormField>
+            <FormField label="Status">
               <select style={s.input} value={form.status}
                 onChange={e => setForm({ ...form, status: e.target.value })}>
                 <option value="available">Tersedia</option>
                 <option value="borrowed">Dipinjam</option>
               </select>
-            </F>
+            </FormField>
           </div>
 
-          <F label="Deskripsi">
+          <FormField label="Deskripsi">
             <textarea style={{ ...s.input, height: 68, resize: 'none' }}
               placeholder="Deskripsi singkat (opsional)..."
               value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })} />
-          </F>
+          </FormField>
         </div>
 
         <div style={s.mFoot}>
@@ -203,7 +206,6 @@ function DeleteModal({ item, onClose, onConfirm }) {
   )
 }
 
-// ── Mobile Item Card ──────────────────────────────────────────────────────────
 function ItemCard({ item, onEdit, onDelete }) {
   return (
     <div style={{

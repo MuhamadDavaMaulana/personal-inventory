@@ -2,18 +2,16 @@ import { useEffect, useState, useMemo } from 'react'
 import Navbar from '../components/Navbar'
 import api from '../services/api'
 
-// Constants 
 const STATUS_MAP = {
-  active:   { label: 'Dipinjam',      bg: '#FFEDD5', color: '#C2410C' },
-  returned: { label: 'Dikembalikan',  bg: '#D1FAE5', color: '#065F46' },
-  late:     { label: 'Terlambat',     bg: '#FEE2E2', color: '#991B1B' },
+  active:   { label: 'Dipinjam',     bg: '#FFEDD5', color: '#C2410C' },
+  returned: { label: 'Dikembalikan', bg: '#D1FAE5', color: '#065F46' },
+  late:     { label: 'Terlambat',    bg: '#FEE2E2', color: '#991B1B' },
 }
 
 const EMPTY_FORM = {
   item_id: '', borrower_name: '', borrowed_at: '', due_date: '', note: '',
 }
 
-// Helpers
 const fmt = (dateStr) => {
   if (!dateStr) return '—'
   const d = new Date(dateStr)
@@ -53,13 +51,28 @@ function SkeletonRow() {
   )
 }
 
+function SkeletonCard() {
+  return (
+    <div style={{
+      background: '#fff', borderRadius: 14, padding: 16,
+      border: '1.5px solid #E5E7EB', marginBottom: 10,
+    }}>
+      {[140, 100, 80].map((w, i) => (
+        <div key={i} style={{
+          height: 13, width: w, borderRadius: 6, marginBottom: 10,
+          background: 'linear-gradient(90deg,#E5E7EB 25%,#F9FAFB 50%,#E5E7EB 75%)',
+          backgroundSize: '200%', animation: 'shimmer 1.4s infinite',
+        }} />
+      ))}
+    </div>
+  )
+}
 
 function LoanModal({ isOpen, onClose, onSubmit, allItems }) {
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
 
- 
   useEffect(() => {
     if (isOpen) {
       const today = new Date().toISOString().split('T')[0]
@@ -99,7 +112,7 @@ function LoanModal({ isOpen, onClose, onSubmit, allItems }) {
 
   return (
     <div style={s.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={s.modal}>
+      <div style={{ ...s.modal, margin: '0 16px' }}>
         <div style={s.mHead}>
           <h2 style={s.mTitle}>📋 Catat Peminjaman</h2>
           <button style={s.closeBtn} onClick={onClose}>✕</button>
@@ -160,7 +173,6 @@ function LoanModal({ isOpen, onClose, onSubmit, allItems }) {
   )
 }
 
-
 function ReturnModal({ loan, onClose, onConfirm }) {
   const [saving, setSaving] = useState(false)
   if (!loan) return null
@@ -176,7 +188,7 @@ function ReturnModal({ loan, onClose, onConfirm }) {
 
   return (
     <div style={s.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={{ ...s.modal, maxWidth: 420 }}>
+      <div style={{ ...s.modal, maxWidth: 420, margin: '0 16px' }}>
         <div style={s.mHead}>
           <h2 style={{ ...s.mTitle, color: '#059669' }}>✅ Konfirmasi Pengembalian</h2>
           <button style={s.closeBtn} onClick={onClose}>✕</button>
@@ -213,12 +225,11 @@ function ReturnModal({ loan, onClose, onConfirm }) {
   )
 }
 
-
 function DeleteModal({ loan, onClose, onConfirm }) {
   if (!loan) return null
   return (
     <div style={s.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={{ ...s.modal, maxWidth: 400 }}>
+      <div style={{ ...s.modal, maxWidth: 400, margin: '0 16px' }}>
         <div style={s.mHead}>
           <h2 style={{ ...s.mTitle, color: '#DC2626' }}>Hapus Catatan</h2>
           <button style={s.closeBtn} onClick={onClose}>✕</button>
@@ -245,18 +256,86 @@ function DeleteModal({ loan, onClose, onConfirm }) {
   )
 }
 
+// ── Mobile Loan Card ──────────────────────────────────────────────────────────
+function LoanCard({ loan, onReturn, onDelete }) {
+  const isLate = loan._status === 'late'
+  const isDone = loan._status === 'returned'
+
+  return (
+    <div style={{
+      background: isLate ? '#FFF7F7' : '#fff',
+      borderRadius: 14, padding: 16,
+      border: `1.5px solid ${isLate ? '#FECACA' : '#E5E7EB'}`,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+        <div style={{ flex: 1, marginRight: 8 }}>
+          <p style={{ fontWeight: 700, color: '#1E3A8A', margin: 0, fontSize: 14 }}>
+            {loan.item?.name || '—'}
+          </p>
+          <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>
+            👤 {loan.borrower_name}
+          </p>
+        </div>
+        <Badge status={loan._status} />
+      </div>
+
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+        <span style={{ fontSize: 12, color: '#6B7280', background: '#F3F4F6', borderRadius: 6, padding: '2px 8px' }}>
+          📅 Pinjam: {fmt(loan.borrowed_at)}
+        </span>
+        {loan.due_date && (
+          <span style={{
+            fontSize: 12, borderRadius: 6, padding: '2px 8px',
+            background: isLate ? '#FEE2E2' : '#F3F4F6',
+            color: isLate ? '#991B1B' : '#6B7280',
+            fontWeight: isLate ? 700 : 400,
+          }}>
+            {isLate ? '⚠️' : '🔔'} Kembali: {fmt(loan.due_date)}
+          </span>
+        )}
+        {loan.returned_at && (
+          <span style={{ fontSize: 12, color: '#059669', background: '#D1FAE5', borderRadius: 6, padding: '2px 8px', fontWeight: 600 }}>
+            ✅ Kembali: {fmt(loan.returned_at)}
+          </span>
+        )}
+      </div>
+
+      {loan.note && (
+        <p style={{ fontSize: 12, color: '#9CA3AF', fontStyle: 'italic', marginBottom: 10, margin: '0 0 10px' }}>
+          📝 {loan.note}
+        </p>
+      )}
+
+      <div style={{ display: 'flex', gap: 8 }}>
+        {!isDone && (
+          <button onClick={() => onReturn(loan)} style={{
+            flex: 1, padding: '8px', borderRadius: 8,
+            background: '#ECFDF5', color: '#059669',
+            border: '1.5px solid #A7F3D0',
+            fontSize: 12, fontWeight: 700, cursor: 'pointer',
+            fontFamily: "'Plus Jakarta Sans',sans-serif",
+          }}>Kembalikan</button>
+        )}
+        <button onClick={() => onDelete(loan)} style={{
+          flex: 1, padding: '8px', borderRadius: 8,
+          background: '#FEF2F2', color: '#DC2626',
+          border: '1.5px solid #FECACA',
+          fontSize: 12, fontWeight: 700, cursor: 'pointer',
+          fontFamily: "'Plus Jakarta Sans',sans-serif",
+        }}>Hapus</button>
+      </div>
+    </div>
+  )
+}
 
 export default function Loans() {
   const [loans, setLoans] = useState([])
   const [allItems, setAllItems] = useState([])
   const [loading, setLoading] = useState(true)
-
-  // Modals
   const [loanModal, setLoanModal] = useState(false)
   const [returnTarget, setReturnTarget] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
-
-  // Filters
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
 
@@ -292,7 +371,6 @@ export default function Loans() {
 
   const activeFilters = [search, filterStatus].filter(Boolean).length
 
-  // Stats
   const stats = useMemo(() => ({
     total:    loans.length,
     active:   loansWithStatus.filter(l => l._status === 'active').length,
@@ -334,19 +412,31 @@ export default function Loans() {
         @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
         select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
         tr.loan-row:hover td { background:#EEF4FF !important; }
-        button:hover { filter:brightness(0.94); }
+
+        .loans-desktop { display: block; }
+        .loans-mobile  { display: none; flex-direction: column; gap: 10px; }
+        .stats-grid    { grid-template-columns: repeat(4, 1fr); }
+        .page-header   { flex-direction: row; align-items: flex-start; }
+        .page-padding  { padding: 32px 24px; }
+
+        @media (max-width: 768px) {
+          .loans-desktop { display: none !important; }
+          .loans-mobile  { display: flex !important; }
+          .stats-grid    { grid-template-columns: repeat(2, 1fr) !important; }
+          .page-header   { flex-direction: column !important; gap: 12px; }
+          .page-padding  { padding: 16px 12px !important; }
+        }
       `}</style>
+
       <Navbar />
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }} className="page-padding">
 
         {/* Page Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }} className="page-header">
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, color: '#1E3A8A', margin: 0 }}>🔄 Peminjaman</h1>
-            <p style={{ fontSize: 14, color: '#6B7280', margin: '4px 0 0' }}>
-              Kelola catatan peminjaman barang
-            </p>
+            <p style={{ fontSize: 14, color: '#6B7280', margin: '4px 0 0' }}>Kelola catatan peminjaman barang</p>
           </div>
           <button style={s.primaryBtn} onClick={() => setLoanModal(true)}>
             + Catat Peminjaman
@@ -354,7 +444,7 @@ export default function Loans() {
         </div>
 
         {/* Stats Bar */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+        <div style={{ display: 'grid', gap: 12, marginBottom: 20 }} className="stats-grid">
           {[
             { label: 'Total',        value: stats.total,    color: '#2563EB', bg: '#EFF6FF' },
             { label: 'Aktif',        value: stats.active,   color: '#D97706', bg: '#FFFBEB' },
@@ -384,14 +474,14 @@ export default function Loans() {
           marginBottom: 16, boxShadow: '0 2px 10px #1E3A8A0A',
           border: '1.5px solid #E5E7EB',
         }}>
-          <div style={{ position: 'relative', flex: '1 1 220px', minWidth: 180 }}>
+          <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 0 }}>
             <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 14 }}>🔍</span>
             <input style={{ ...s.filterInput, paddingLeft: 32 }}
-              placeholder="Cari nama barang / peminjam..."
+              placeholder="Cari barang / peminjam..."
               value={search}
               onChange={e => setSearch(e.target.value)} />
           </div>
-          <select style={{ ...s.filterInput, flex: '0 0 160px' }}
+          <select style={{ ...s.filterInput, flex: '1 1 140px', minWidth: 0 }}
             value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
             <option value="">Semua Status</option>
             <option value="active">Dipinjam</option>
@@ -414,8 +504,8 @@ export default function Loans() {
           Menampilkan <strong style={{ color: '#1E3A8A' }}>{filtered.length}</strong> dari {loans.length} catatan
         </p>
 
-        {/* Table */}
-        <div style={{
+        {/* ── Desktop Table ── */}
+        <div className="loans-desktop" style={{
           background: '#fff', borderRadius: 16,
           boxShadow: '0 2px 16px #1E3A8A0D', overflow: 'hidden',
           border: '1.5px solid #E5E7EB',
@@ -423,11 +513,11 @@ export default function Loans() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
             <thead>
               <tr style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}>
-                {['Barang', 'Peminjam', 'Tgl Pinjam', 'Batas Kembali', 'Tgl Dikembalikan', 'Status', 'Aksi'].map((h, i) => (
+                {['Barang', 'Peminjam', 'Tgl Pinjam', 'Batas Kembali', 'Tgl Kembali', 'Status', 'Aksi'].map((h, i) => (
                   <th key={h} style={{
                     padding: '14px 16px', color: '#fff', fontWeight: 700,
                     textAlign: i > 1 ? 'center' : 'left', fontSize: 13,
-                    letterSpacing: '0.02em', whiteSpace: 'nowrap',
+                    whiteSpace: 'nowrap',
                   }}>{h}</th>
                 ))}
               </tr>
@@ -458,36 +548,24 @@ export default function Loans() {
                       background: isLate ? '#FFF7F7' : 'transparent',
                     }}>
                       <td style={{ padding: '13px 16px' }}>
-                        <p style={{ fontWeight: 700, color: '#1E3A8A', margin: 0 }}>
-                          {loan.item?.name || '—'}
-                        </p>
+                        <p style={{ fontWeight: 700, color: '#1E3A8A', margin: 0 }}>{loan.item?.name || '—'}</p>
                         {loan.note && (
-                          <p style={{ fontSize: 12, color: '#9CA3AF', margin: '2px 0 0', fontStyle: 'italic' }}>
-                            {loan.note}
-                          </p>
+                          <p style={{ fontSize: 12, color: '#9CA3AF', margin: '2px 0 0', fontStyle: 'italic' }}>{loan.note}</p>
                         )}
                       </td>
-                      <td style={{ padding: '13px 16px', color: '#374151', fontWeight: 600 }}>
-                        {loan.borrower_name}
-                      </td>
-                      <td style={{ padding: '13px 16px', textAlign: 'center', color: '#6B7280', fontSize: 13 }}>
-                        {fmt(loan.borrowed_at)}
-                      </td>
+                      <td style={{ padding: '13px 16px', color: '#374151', fontWeight: 600 }}>{loan.borrower_name}</td>
+                      <td style={{ padding: '13px 16px', textAlign: 'center', color: '#6B7280', fontSize: 13 }}>{fmt(loan.borrowed_at)}</td>
                       <td style={{ padding: '13px 16px', textAlign: 'center', fontSize: 13 }}>
                         {loan.due_date ? (
                           <span style={{ color: isLate ? '#DC2626' : '#6B7280', fontWeight: isLate ? 700 : 400 }}>
                             {isLate && '⚠️ '}{fmt(loan.due_date)}
                           </span>
-                        ) : (
-                          <span style={{ color: '#CBD5E1' }}>—</span>
-                        )}
+                        ) : <span style={{ color: '#CBD5E1' }}>—</span>}
                       </td>
-                      <td style={{ padding: '13px 16px', textAlign: 'center', color: '#6B7280', fontSize: 13 }}>
-                        {loan.returned_at ? (
-                          <span style={{ color: '#059669', fontWeight: 600 }}>{fmt(loan.returned_at)}</span>
-                        ) : (
-                          <span style={{ color: '#CBD5E1' }}>—</span>
-                        )}
+                      <td style={{ padding: '13px 16px', textAlign: 'center', fontSize: 13 }}>
+                        {loan.returned_at
+                          ? <span style={{ color: '#059669', fontWeight: 600 }}>{fmt(loan.returned_at)}</span>
+                          : <span style={{ color: '#CBD5E1' }}>—</span>}
                       </td>
                       <td style={{ padding: '13px 16px', textAlign: 'center' }}>
                         <Badge status={loan._status} />
@@ -495,17 +573,11 @@ export default function Loans() {
                       <td style={{ padding: '13px 16px', textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
                           {!isDone && (
-                            <ActionBtn
-                              label="Kembalikan"
-                              bg="#ECFDF5" color="#059669" border="#A7F3D0"
-                              onClick={() => setReturnTarget(loan)}
-                            />
+                            <ActionBtn label="Kembalikan" bg="#ECFDF5" color="#059669" border="#A7F3D0"
+                              onClick={() => setReturnTarget(loan)} />
                           )}
-                          <ActionBtn
-                            label="Hapus"
-                            bg="#FEF2F2" color="#DC2626" border="#FECACA"
-                            onClick={() => setDeleteTarget(loan)}
-                          />
+                          <ActionBtn label="Hapus" bg="#FEF2F2" color="#DC2626" border="#FECACA"
+                            onClick={() => setDeleteTarget(loan)} />
                         </div>
                       </td>
                     </tr>
@@ -515,30 +587,39 @@ export default function Loans() {
             </tbody>
           </table>
         </div>
+
+        {/* ── Mobile Cards ── */}
+        <div className="loans-mobile">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+          ) : filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+              <div style={{ fontSize: 40, marginBottom: 10 }}>📋</div>
+              <p style={{ color: '#374151', fontWeight: 600, fontSize: 15 }}>
+                {activeFilters > 0 ? 'Tidak ada catatan yang cocok' : 'Belum ada peminjaman'}
+              </p>
+            </div>
+          ) : (
+            filtered.map(loan => (
+              <LoanCard
+                key={loan.loan_id}
+                loan={loan}
+                onReturn={setReturnTarget}
+                onDelete={setDeleteTarget}
+              />
+            ))
+          )}
+        </div>
+
       </div>
 
-      {/* Modals */}
-      <LoanModal
-        isOpen={loanModal}
-        onClose={() => setLoanModal(false)}
-        onSubmit={handleAdd}
-        allItems={allItems}
-      />
-      <ReturnModal
-        loan={returnTarget}
-        onClose={() => setReturnTarget(null)}
-        onConfirm={handleReturn}
-      />
-      <DeleteModal
-        loan={deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDelete}
-      />
+      <LoanModal isOpen={loanModal} onClose={() => setLoanModal(false)} onSubmit={handleAdd} allItems={allItems} />
+      <ReturnModal loan={returnTarget} onClose={() => setReturnTarget(null)} onConfirm={handleReturn} />
+      <DeleteModal loan={deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} />
     </div>
   )
 }
 
-// ─── Tiny Action Button ───────────────────────────────────────────────────────
 function ActionBtn({ label, bg, color, border, onClick }) {
   return (
     <button onClick={onClick} style={{
@@ -546,12 +627,11 @@ function ActionBtn({ label, bg, color, border, onClick }) {
       borderRadius: 8, padding: '5px 12px', fontSize: 12,
       fontWeight: 700, cursor: 'pointer',
       fontFamily: "'Plus Jakarta Sans',sans-serif",
-      transition: 'filter .12s', whiteSpace: 'nowrap',
+      whiteSpace: 'nowrap',
     }}>{label}</button>
   )
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const s = {
   primaryBtn: {
     background: 'linear-gradient(135deg,#2563EB,#1D4ED8)',

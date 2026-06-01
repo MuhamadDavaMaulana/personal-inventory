@@ -35,7 +35,7 @@ export default function Dashboard() {
         })
 
         setRecentItems([...items].reverse().slice(0, 5))
-        setRecentLoans(loans.filter(l => l.status === 'active').slice(0, 5))
+        setRecentLoans(loans.filter(l => l.returned_at === null).slice(0, 5))
       } catch (_) {}
       finally { setLoading(false) }
     }

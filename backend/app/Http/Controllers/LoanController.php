@@ -23,6 +23,7 @@ class LoanController extends Controller
             'item_id'       => 'required|exists:items,item_id',
             'borrower_name' => 'required|string|max:100',
             'borrowed_at'   => 'required|date',
+            'due_date'      => 'nullable|date|after_or_equal:borrowed_at',
             'note'          => 'nullable|string',
         ]);
 
@@ -32,7 +33,7 @@ class LoanController extends Controller
                     ->firstOrFail();
 
         $loan = Loan::create($request->only([
-            'item_id', 'borrower_name', 'borrowed_at', 'note'
+            'item_id', 'borrower_name', 'borrowed_at', 'due_date', 'note'
         ]));
 
         // Update status barang jadi borrowed

@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Loan extends Model
 {
     protected $primaryKey = 'loan_id';
+
     protected $fillable = [
-        'item_id', 'borrower_name',
-        'borrowed_at', 'returned_at', 'note'
+        'item_id',
+        'borrower_name',
+        'borrowed_at',
+        'due_date',
+        'returned_at',
+        'note',
     ];
 
     public function item()

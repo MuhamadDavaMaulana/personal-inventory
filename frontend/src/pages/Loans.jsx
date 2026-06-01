@@ -68,6 +68,17 @@ function SkeletonCard() {
   )
 }
 
+// ── PERBAIKAN: FormField dipindah ke luar LoanModal ──────────────────────────
+function FormField({ label, error, children }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={s.label}>{label}</label>
+      {children}
+      {error && <p style={s.errText}>{error}</p>}
+    </div>
+  )
+}
+
 function LoanModal({ isOpen, onClose, onSubmit, allItems }) {
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
@@ -102,14 +113,6 @@ function LoanModal({ isOpen, onClose, onSubmit, allItems }) {
     setSaving(false)
   }
 
-  const F = ({ label, error, children }) => (
-    <div style={{ marginBottom: 14 }}>
-      <label style={s.label}>{label}</label>
-      {children}
-      {error && <p style={s.errText}>{error}</p>}
-    </div>
-  )
-
   return (
     <div style={s.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div style={{ ...s.modal, margin: '0 16px' }}>
@@ -118,7 +121,7 @@ function LoanModal({ isOpen, onClose, onSubmit, allItems }) {
           <button style={s.closeBtn} onClick={onClose}>✕</button>
         </div>
         <div style={s.mBody}>
-          <F label="Barang *" error={errors.item_id}>
+          <FormField label="Barang *" error={errors.item_id}>
             <select style={{ ...s.input, ...(errors.item_id ? s.inputErr : {}) }}
               value={form.item_id}
               onChange={e => setForm({ ...form, item_id: e.target.value })}>
@@ -132,34 +135,34 @@ function LoanModal({ isOpen, onClose, onSubmit, allItems }) {
                 ⚠️ Tidak ada barang tersedia saat ini.
               </p>
             )}
-          </F>
+          </FormField>
 
-          <F label="Nama Peminjam *" error={errors.borrower_name}>
+          <FormField label="Nama Peminjam *" error={errors.borrower_name}>
             <input style={{ ...s.input, ...(errors.borrower_name ? s.inputErr : {}) }}
               placeholder="Contoh: Budi Santoso"
               value={form.borrower_name}
               onChange={e => setForm({ ...form, borrower_name: e.target.value })} />
-          </F>
+          </FormField>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <F label="Tanggal Pinjam *" error={errors.borrowed_at}>
+            <FormField label="Tanggal Pinjam *" error={errors.borrowed_at}>
               <input type="date" style={{ ...s.input, ...(errors.borrowed_at ? s.inputErr : {}) }}
                 value={form.borrowed_at}
                 onChange={e => setForm({ ...form, borrowed_at: e.target.value })} />
-            </F>
-            <F label="Batas Kembali" error={errors.due_date}>
+            </FormField>
+            <FormField label="Batas Kembali" error={errors.due_date}>
               <input type="date" style={{ ...s.input, ...(errors.due_date ? s.inputErr : {}) }}
                 value={form.due_date}
                 onChange={e => setForm({ ...form, due_date: e.target.value })} />
-            </F>
+            </FormField>
           </div>
 
-          <F label="Catatan">
+          <FormField label="Catatan">
             <textarea style={{ ...s.input, height: 64, resize: 'none' }}
               placeholder="Catatan tambahan (opsional)..."
               value={form.note}
               onChange={e => setForm({ ...form, note: e.target.value })} />
-          </F>
+          </FormField>
         </div>
         <div style={s.mFoot}>
           <button style={s.cancelBtn} onClick={onClose}>Batal</button>
@@ -256,7 +259,6 @@ function DeleteModal({ loan, onClose, onConfirm }) {
   )
 }
 
-// ── Mobile Loan Card ──────────────────────────────────────────────────────────
 function LoanCard({ loan, onReturn, onDelete }) {
   const isLate = loan._status === 'late'
   const isDone = loan._status === 'returned'

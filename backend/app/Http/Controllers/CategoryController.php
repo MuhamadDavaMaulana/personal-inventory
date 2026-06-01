@@ -9,7 +9,9 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::where('user_id', $request->user()->user_id)->get();
+        $categories = Category::where('user_id', $request->user()->user_id)
+                               ->withCount('items')
+                               ->get();
         return response()->json($categories);
     }
 
@@ -33,6 +35,7 @@ class CategoryController extends Controller
     {
         $category = Category::where('category_id', $id)
                             ->where('user_id', $request->user()->user_id)
+                            ->withCount('items')
                             ->firstOrFail();
 
         return response()->json($category);

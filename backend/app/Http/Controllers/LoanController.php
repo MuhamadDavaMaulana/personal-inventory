@@ -36,8 +36,15 @@ class LoanController extends Controller
             'item_id', 'borrower_name', 'borrowed_at', 'due_date', 'note'
         ]));
 
-        // Update status barang jadi borrowed
-        $item->update(['status' => 'borrowed']);
+        // Hitung jumlah pinjaman aktif (belum dikembalikan)
+        $activeLoanCount = Loan::where('item_id', $item->item_id)
+                               ->whereNull('returned_at')
+                               ->count();
+
+        // Status jadi borrowed hanya jika semua qty sudah dipinjam
+        if ($activeLoanCount >= $item->quantity) {
+            $item->update(['status' => 'borrowed']);
+        }
 
         return response()->json($loan->load('item'), 201);
     }
@@ -63,8 +70,15 @@ class LoanController extends Controller
 
         $loan->update(['returned_at' => $request->returned_at]);
 
-        // Update status barang kembali jadi available
-        $loan->item->update(['status' => 'available']);
+        // Hitung sisa pinjaman aktif setelah dikembalikan
+        $activeLoanCount = Loan::where('item_id', $loan->item_id)
+                               ->whereNull('returned_at')
+                               ->count();
+
+        // Status kembali available jika tidak ada pinjaman aktif
+        if ($activeLoanCount === 0) {
+            $loan->item->update(['status' => 'available']);
+        }
 
         return response()->json(['message' => 'Barang berhasil dikembalikan', 'loan' => $loan]);
     }
@@ -73,9 +87,20 @@ class LoanController extends Controller
     {
         $loan = Loan::whereHas('item', function ($q) use ($request) {
                         $q->where('user_id', $request->user()->user_id);
-                     })->findOrFail($id);
+                     })->with('item')->findOrFail($id);
 
+        $itemId = $loan->item_id;
         $loan->delete();
+
+        // Hitung sisa pinjaman aktif setelah dihapus
+        $activeLoanCount = Loan::where('item_id', $itemId)
+                               ->whereNull('returned_at')
+                               ->count();
+
+        // Reset status ke available jika tidak ada pinjaman aktif
+        if ($activeLoanCount === 0) {
+            Item::where('item_id', $itemId)->update(['status' => 'available']);
+        }
 
         return response()->json(['message' => 'Data peminjaman dihapus']);
     }
